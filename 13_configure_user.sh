@@ -39,7 +39,7 @@ if [[ ! -f "${ZSH_CONFIG_FILE}.bak" ]]; then
 fi
 
 # Configure oh-my-zsh
-sed -i -e 's/plugins=(git)/plugins=(git alias-finder colorize copypath dirhistory extract rsync sudo ssh-agent universalarchive virtualenv kubectl)/g' -e 's/ZSH_THEME="robbyrussell"/ZSH_THEME="gnzh"/g' ${ZSH_CONFIG_FILE}
+sed -i -e 's/plugins=(git)/plugins=(git alias-finder branch colorize copypath direnv dirhistory extract kubectl rsync sudo ssh-agent universalarchive virtualenv)/g' -e 's/ZSH_THEME="robbyrussell"/ZSH_THEME="gnzh"/g' ${ZSH_CONFIG_FILE}
 # Add custom aliases
 echo "" >> ${ZSH_CONFIG_FILE}
 echo "source $HOME/.dbc_aliases" >> ${ZSH_CONFIG_FILE}

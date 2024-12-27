@@ -15,7 +15,7 @@ title() {
 # Main loop
 
 ## Install packages
-title "Install pip and Ansible"
+title "Install packages"
 apt update && apt install \
     bat \
     curl \
@@ -28,10 +28,6 @@ apt update && apt install \
     vim \
     zsh \
     -y
-
-## Install Ansible
-apt-add-repository --yes ppa:ansible/ansible
-python3 -m pip install --user ansible
 ln -s /usr/bin/python3 /usr/bin/python
 
 title "Configuration"

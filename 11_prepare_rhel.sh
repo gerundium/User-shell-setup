@@ -31,7 +31,6 @@ dnf install -y \
     tree \
     vim \
     zsh
-python3 -m pip install --user ansible
 
 ## Configuration
 title "Configuration"
