@@ -8,7 +8,7 @@ RELEASE=$(grep ID_LIKE /etc/*elease | cut -d '"' -f2)
 OS_DEBIAN=$(echo ${RELEASE} | grep -o debian | wc -l)
 OS_RHEL=$(echo ${RELEASE} | grep -o rhel | wc -l)
 TESTUSER_ENABLE_FILE="/tmp/00_install.tmp"
-BASE_DIR=$(dirname $0)
+BASE_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 # Functions
 title() {
@@ -57,6 +57,7 @@ if [[ ${TESTUSER_ENABLE} == "y" ]]; then
     su -c "cd $BASE_DIR; bash 13_configure_user.sh" - test
 else
     title "Running 12_aliases.sh for user ${USERNAME_OMZSH}"
+    echo "su -c \"cd $BASE_DIR; bash 12_aliases.sh\" - ${USERNAME_OMZSH}"
     su -c "cd $BASE_DIR; bash 12_aliases.sh" - ${USERNAME_OMZSH}
     title "Running 13_configure_user.sh for user ${USERNAME_OMZSH}"
     su -c "cd $BASE_DIR; bash 13_configure_user.sh" - ${USERNAME_OMZSH}
