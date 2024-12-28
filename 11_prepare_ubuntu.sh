@@ -29,7 +29,9 @@ apt update && apt install \
     vim \
     zsh \
     -y
-ln -s /usr/bin/python3 /usr/bin/python
+if [[ ! -f /usr/bin/python ]]; then
+    ln -s /usr/bin/python3 /usr/bin/python
+fi
 
 title "Configuration"
 ## Install test user
