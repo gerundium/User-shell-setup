@@ -2,7 +2,7 @@
 
 🏠 This repository contains shell scripts that will configure the basic user shell.
 
-![alt text](image.png)
+![alt text](.media/image.png)
 
 ## TL;DR;
 
