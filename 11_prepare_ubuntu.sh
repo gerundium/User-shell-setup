@@ -4,6 +4,7 @@
 set -eu
 
 # Variables
+TESTUSER_ENABLE_FILE="/tmp/00_install.tmp"
 
 # Functions
 title() {
