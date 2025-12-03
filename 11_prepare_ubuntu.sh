@@ -20,7 +20,11 @@ title "Install packages"
 apt update && apt install \
     bat \
     curl \
+    fzf \
     git \
+    ncdu \
+    nnn \
+    neovim \
     pip \
     python3 \
     software-properties-common \

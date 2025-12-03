@@ -5,6 +5,7 @@ set -eu
 
 # Variables
 ALIASES_FILENAME="$HOME/.dbc_aliases"
+VARIABLES_FILENAME="$HOME/.dbc_variables"
 
 # Functions
 title() {
@@ -41,10 +42,27 @@ if [ -x "$(command -v batcat)" ]; then
         alias less=batcat
         alias cat='batcat'
 fi
+
+## Neovim
+alias n=nvim
+alias sn='sudo nvim'
+
+## nnn
+alias nnn='nnn -d'
 EOF
 fi
 
-ALIASES_FILENAME="$HOME/.dbc_aliases"
+if [[ ! -f ${VARIABLES_FILENAME} ]]; then
+    cat << EOF >> ${VARIABLES_FILENAME}
+# --
+# nnn
+# --
+export NNN_OPENER="nuke"
+export NNN_FIFO=/tmp/nnn.fifo
+export NNN_PLUG='f:finder;o:fzopen;p:mocq;d:diffs;t:nmount;v:imgview;i:ipinfo'
+EOF
+fi
+
 CHECK_IF_ALIASES_IN_ZSHRC=$(grep 'echo "source ${ALIASES_FILENAME}"' .zshrc | wc -l)
 if [[ ${CHECK_IF_ALIASES_IN_ZSHRC} -eq 0 ]]; then
     echo "" >> $HOME/.zshrc
@@ -52,6 +70,14 @@ if [[ ${CHECK_IF_ALIASES_IN_ZSHRC} -eq 0 ]]; then
     echo "# dbc-setup-user-shell" >> $HOME/.zshrc
     echo "# ---" >> $HOME/.zshrc
     echo "source ${ALIASES_FILENAME}" >> $HOME/.zshrc
+fi
+CHECK_IF_VARIABLES_IN_ZSHRC=$(grep 'echo "source ${ALIASES_FILENAME}"' .zshrc | wc -l)
+if [[ ${CHECK_IF_VARIABLES_IN_ZSHRC} -eq 0 ]]; then
+    echo "" >> $HOME/.zshrc
+    echo "# ---" >> $HOME/.zshrc
+    echo "# dbc-setup-user-shell" >> $HOME/.zshrc
+    echo "# ---" >> $HOME/.zshrc
+    echo "source ${VARIABLES_FILENAME}" >> $HOME/.zshrc
 fi
 
 title "Finished!"
