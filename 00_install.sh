@@ -2,68 +2,28 @@
 
 # Prepare environment
 set -eu
-
-# Variables
-RELEASE=$(grep ID_LIKE /etc/*elease | cut -d '"' -f2)
-OS_DEBIAN=$(echo ${RELEASE} | grep -o debian | wc -l)
-OS_RHEL=$(echo ${RELEASE} | grep -o rhel | wc -l)
-TESTUSER_ENABLE_FILE="/tmp/00_install.tmp"
-BASE_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
-
-# Functions
-title() {
-    local color='\033[1;37m'
-    local nc='\033[0m'
-    printf "\n${color}$1${nc}\n"
-}
+trap ctrl_c INT
+INSTALL_DIR=$(dirname "$(readlink -f "$0")")
+PATH_TO_SCRIPT="$0"
+source ${INSTALL_DIR}/.functions
+source ${INSTALL_DIR}/.variables
 
 # Main loop
 
-## Install Test user
-read -p "Install a test user for demonstration purpose? [y/N] " TESTUSER_ENABLE
-if [[ ${TESTUSER_ENABLE} == "y" ]]; then
-    touch ${TESTUSER_ENABLE_FILE}
-else
-    ## Choose user
-    read -p "Whats the username of the user that will be configured for oh-my-zsh? " USERNAME_OMZSH
-    if [[ -z $USERNAME_OMZSH ]]; then
-        echo "[info]: You does not specify a username. Therefore the is nothing to do. Bye"
-        exit 0
-    fi
-    getent passwd ${USERNAME_OMZSH} > /dev/null
-    if [[ $? -ne 0 ]]; then
-        echo "[CRIT]: Sorry user ${USERNAME_OMZSH} does not exist."
-        exit 1
-    fi
-fi
+## 1. Info next steps
+info_next_steps
 
-## Run OS specific install process
-if [[ ${OS_DEBIAN} -eq 1 ]]; then
-    cd $BASE_DIR
-    bash 11_prepare_ubuntu.sh
-elif [[ ${OS_RHEL} -eq 1 ]]; then
-    cd $BASE_DIR
-    bash 11_prepare_rhel.sh
-else
-    echo "[WARN]: Sorry your OS is currently not supported."
-    exit 1
-fi
+## 2. Install packages
+install_packages
 
+## 3. Prepare user setup
+choose_user
 
-if [[ ${TESTUSER_ENABLE} == "y" ]]; then
-    title "Running 12_aliases.sh for user test"
-    su -c "cd $BASE_DIR; bash 12_aliases.sh" - test
-    title "Running 13_configure_user.sh for user test"
-    su -c "cd $BASE_DIR; bash 13_configure_user.sh" - test
-else
-    title "Running 12_aliases.sh for user ${USERNAME_OMZSH}"
-    echo "su -c \"cd $BASE_DIR; bash 12_aliases.sh\" - ${USERNAME_OMZSH}"
-    su -c "cd $BASE_DIR; bash 12_aliases.sh" - ${USERNAME_OMZSH}
-    title "Running 13_configure_user.sh for user ${USERNAME_OMZSH}"
-    su -c "cd $BASE_DIR; bash 13_configure_user.sh" - ${USERNAME_OMZSH}
-fi
+## 4. User setup
+sudo -iu $USERNAME_NEW bash -c "export INSTALL_DIR=$(dirname "$(readlink -f "$0")"); source ${INSTALL_DIR}/.functions; source ${INSTALL_DIR}/.variables; setup_user_environment"
 
-cd $BASE_DIR; bash 14_housekeeping.sh
-
+## 5. Finish
 title "Finished!"
 echo ""
+
+exit 0

@@ -1,0 +1,50 @@
+# ---
+# dbc libs
+# ---
+export DBC_LIBS_HOME="~/custom/Libs"
+export PYTHONPATH="$DBC_LIBS_HOME/python"
+
+# --
+# Vagrant
+# --
+export VAGRANT_EXPERIMENTAL="disks"
+
+# --
+# nnn
+# --
+export NNN_OPENER="nuke"
+export NNN_PREVIEW="cat"
+export NNN_BATSTYLE="numbers"
+export NNN_BATTHEME="ansi"
+export TERMINAL="tmux"
+export NNN_TERMINAL="tmux"
+export NNN_DE_FILE_MANAGER=preview-tui
+export NNN_FIFO="/tmp/nnn.fifo"
+export NNN_PLUG='f:finder;o:fzopen;p:preview-tui;d:diffs;t:nmount;v:imgview;g:-!git diff;s:! readlink -f $nnn'
+
+# -- 
+# Kustomize
+# -- 
+export PATH=$HOME/bin:/usr/local/bin:$PATH:$HOME/.rd/bin:$HOME/custom/progs/kustomize
+
+# -- 
+# dyff
+# -- 
+export PATH=$HOME/bin:/usr/local/bin:$PATH:$HOME/.rd/bin:$HOME/custom/progs/dyff
+
+# -- 
+# Gerundium bcrypt hasher
+# -- 
+export PATH=$HOME/custom/progs/gbh:$PATH
+
+# -- 
+# Cilium
+# -- 
+export PATH=$HOME/custom/progs/cilium:$PATH
+
+# --
+# ssh-agent
+# --
+eval `keychain --eval id_rsa`
+# Need to add git config changes here to persist them
+git config --global core.sshCommand "ssh -o IdentityAgent=$SSH_AUTH_SOCK"
