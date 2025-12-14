@@ -1,0 +1,9 @@
+RELEASE=$(grep ID_LIKE /etc/*elease | cut -d '"' -f2)
+OS_DEBIAN=$(echo ${RELEASE} | grep -o debian | wc -l)
+OS_RHEL=$(echo ${RELEASE} | grep -o "rhel\|fedora" | wc -l)
+BASE_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
+PROMPT_OMZ=""
+PROMPT_STARSHIP=""
+BASEDIR_CONFIG="$HOME/.config/user-shell-setup"
+USS_OS=""
+USS_TESTUSER=""

@@ -1,0 +1,61 @@
+# --
+# arch enhancements
+# --
+
+alias l='ls'
+alias si='sudo -i'
+alias k='kubectl'
+alias cdp='cd ~/Projekte'
+alias cat_cert='openssl x509 -text -in'
+
+## pass options to free ##
+alias meminfo='free -m -l -t'
+
+## get top process eating memory
+alias psmem='ps auxf | sort -nr -k 4'
+alias psmem10='ps auxf | sort -nr -k 4 | head -10'
+
+## get top process eating cpu ##
+alias pscpu='ps auxf | sort -nr -k 3'
+alias pscpu10='ps auxf | sort -nr -k 3 | head -10'
+
+## Get server cpu info ##
+alias cpuinfo='lscpu'
+
+## older system use /proc/cpuinfo ##
+##alias cpuinfo='less /proc/cpuinfo' ##
+
+## get GPU ram on desktop / laptop##
+alias gpumeminfo='grep -i --color memory /var/log/Xorg.0.log'
+
+## Xelatex
+alias xelatex='docker run --rm -v ${PWD}:/data gerundium/xelatex xelatex '
+
+## markdown to html
+function mkd() {
+  pandoc $1 > /tmp/$1.html
+  xdg-open /tmp/$1.html
+}
+
+## Pandock
+alias pandock='docker run --rm -v "$(pwd):/data" -u $(id -u):$(id -g) pandoc/extra'
+
+## Neovim
+alias n=nvim
+alias sn='sudo nvim'
+
+## nnn
+alias nnn='nnn -d -Pp'
+
+# make a directory and cd to it
+mkcd()
+{
+    test -d "$1" || mkdir "$1" && cd "$1"
+}
+
+# cilium
+alias cilium='cilium-cli'
+
+# hugo
+alias hugo-server='docker run --rm -p 1313:1313 -v "$(pwd):/src" -u $(id -u):$(id -g) gerundium/hugo:v20251210 hugo server -w --bind=0.0.0.0'
+alias hugo='docker run --rm -p 1313:1313 -v "$(pwd):/src" -u $(id -u):$(id -g) gerundium/hugo:v20251210 hugo'

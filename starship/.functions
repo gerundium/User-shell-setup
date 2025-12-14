@@ -1,0 +1,189 @@
+title() {
+    local color='\033[1;37m'
+    local nc='\033[0m'
+    printf "\n${color}$1${nc}\n"
+}
+
+function ctrl_c() {
+        echo "Ctrl + C happened"
+        exit 0
+}
+
+choose_user() {
+    ## Which usernames shell prompt shall be changed?
+    read -p "Install a test user for demonstration purpose? [y/N] " TESTUSER_ENABLE
+    if [[ ${TESTUSER_ENABLE} == "y" ]]; then
+        export USS_TESTUSER="true"
+        USERNAME_NEW="test"
+    else
+        ## Choose user
+        read -p "Whats the username of the user that should get the new shell prompt? " USERNAME_NEW
+        if [[ -z $USERNAME_NEW ]]; then
+            echo "[info]: You does not specify a username. Therefore the is nothing to do. Bye"
+        fi
+    fi
+
+    if id "${USERNAME_NEW}" >/dev/null 2>&1; then
+        echo "User ${USERNAME_NEW} exists"
+    else
+        echo "User ${USERNAME_NEW} does not exist"
+        read -p "Shall we create a new user named ${USERNAME_NEW} [enter | strg+c] "
+        create_user
+    fi
+}
+
+detect_os() {
+    ## Run OS specific install process
+    if [[ ${OS_DEBIAN} -ge 1 ]]; then
+        echo "   [info]: Debian based OS was detected"
+        USS_OS="Ubuntu"
+    elif [[ ${OS_RHEL} -ge 1 ]]; then
+        echo "   [info]: Rhel based OS was detected"
+        USS_OS="Rhel"
+    else
+        echo "[WARN]: Sorry your OS is currently not supported."
+        exit 1
+    fi
+}
+
+info_next_steps() {
+    # Show detected os
+    echo "[info]: Preview detect_os"
+    detect_os
+    if [[ ${USS_OS} == "Ubuntu" ]]; then
+        echo "[info]: Preview ubuntu_setup"
+        declare -f ubuntu_setup
+    elif [[ ${USS_OS} == "Rhel" ]]; then
+        echo "[info]: Preview rhel_setup"
+        declare -f rhel_setup
+    fi
+}
+
+ubuntu_setup() {
+    ## Prepare repositories
+    apt update -y && apt install -y curl
+    install -dm 755 /etc/apt/keyrings
+    ### Mise
+    curl -fSs https://mise.jdx.dev/gpg-key.pub | tee /etc/apt/keyrings/mise-archive-keyring.pub 1> /dev/null
+    echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.pub arch=amd64] https://mise.jdx.dev/deb stable main" | tee /etc/apt/sources.list.d/mise.list
+
+    ## Install packages
+    title "Install packages"
+    apt update -y && DEBIAN_FRONTEND=noninteractive TZ="Europe/Berlin" apt install \
+        atool \
+        bat \
+        bash-completion \
+        curl \
+        eza \
+        fzf \
+        git \
+        keychain \
+        mise \
+        ncdu \
+        nnn \
+        neovim \
+        pip \
+        python3 \
+        rsync \
+        software-properties-common \
+        sudo \
+        tmux \
+        tree \
+        vim \
+        zsh \
+        -y
+
+    ## Install Starship
+    echo "[info]: Install starship"
+    curl -sS https://starship.rs/install.sh | sh -s -- --yes
+}
+
+rhel_setup() {
+    ## Install packages
+    title "Enable Epel repo"
+    dnf install -y dnf-plugins-core
+    dnf config-manager --set-enabled crb
+    dnf install epel-release -y
+    dnf copr enable jdxcode/mise -y
+
+    title "Install pip and Ansible"
+    dnf install -y \
+        atool \
+        bash-completion \
+        bat \
+        diffutils \
+        util-linux-user \
+        git \
+        fzf \
+        keychain \
+        mise \
+        ncdu \
+        neovim \
+        nnn \
+        pip \
+        rsync \
+        sudo \
+        tmux \
+        tree \
+        vim \
+        wget \
+        zsh
+
+        wget -c https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz -O - | tar xz
+        sudo chmod +x eza
+        sudo chown root:root eza
+        sudo mv eza /usr/local/bin/eza
+
+        ## Install Starship
+        echo "[info]: Install starship"
+        curl -sS https://starship.rs/install.sh | sh -s -- --yes
+}
+
+install_packages() {
+    read -p "Proceed [enter | strg+c] "
+    if [[ "${USS_OS}" == "Ubuntu" ]]; then
+        ubuntu_setup
+    elif [[ "${USS_OS}" == "Rhel" ]]; then
+        rhel_setup
+    fi
+}
+
+create_user() {
+    title "Create user"
+    ## Install test user
+    # quietly add a user without password
+    adduser --quiet --disabled-password --shell /bin/bash --home /home/${USERNAME_NEW} --gecos "User" ${USERNAME_NEW} || adduser --shell /bin/bash --home /home/${USERNAME_NEW} ${USERNAME_NEW}
+    # set password
+    echo "test:test" | chpasswd
+    echo "test ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
+}
+
+setup_user_environment() {
+    title "setup_user_environment"
+    # Create ssh directory
+    if [[ ! -d "${BASEDIR_CONFIG}" ]]; then
+      mkdir -p ${BASEDIR_CONFIG}
+      chmod 0750 ${BASEDIR_CONFIG}
+    fi
+
+    # Deploy config files
+    rsync -av ${INSTALL_DIR}/dist/bash/default/ ${BASEDIR_CONFIG}/
+    rsync -av ${INSTALL_DIR}/dist/bash/customization/ ${HOME}/
+
+    LINE_1='source ~/.config/user-shell-setup/rc'
+    LINE_2='source ~/.dbc_variables'
+    LINE_3='source ~/.dbc_aliases'
+    LINE_4='tmux'
+    grep -qxF "$LINE_1" ~/.bashrc || echo "$LINE_1" >> ~/.bashrc
+    grep -qxF "$LINE_2" ~/.bashrc || echo "$LINE_2" >> ~/.bashrc
+    grep -qxF "$LINE_3" ~/.bashrc || echo "$LINE_3" >> ~/.bashrc
+    grep -qxF "$LINE_4" ~/.bashrc || echo "$LINE_4" >> ~/.bashrc
+
+    ## Install nnn plugins
+    echo "[info]: Install nnn plugins"
+    curl -sS https://raw.githubusercontent.com/jarun/nnn/master/plugins/getplugs | sh
+}
+
+my_whoami() {
+    echo "This is a function running as $(whoami)"
+}

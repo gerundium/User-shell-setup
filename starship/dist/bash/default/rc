@@ -1,0 +1,6 @@
+source ~/.config/user-shell-setup/shell
+source ~/.config/user-shell-setup/aliases
+source ~/.config/user-shell-setup/functions
+source ~/.config/user-shell-setup/init
+source ~/.config/user-shell-setup/envs
+[[ $- == *i* ]] && bind -f ~/.config/user-shell-setup/inputrc
