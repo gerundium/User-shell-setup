@@ -205,11 +205,11 @@ setup_user_environment() {
     LINE_1='source ~/.config/user-shell-setup/rc'
     LINE_2='source ~/.dbc_variables'
     LINE_3='source ~/.dbc_aliases'
-    LINE_4='tmux'
+    #LINE_4='tmux'
     grep -qxF "$LINE_1" ~/.bashrc || echo "$LINE_1" >> ~/.bashrc
     grep -qxF "$LINE_2" ~/.bashrc || echo "$LINE_2" >> ~/.bashrc
     grep -qxF "$LINE_3" ~/.bashrc || echo "$LINE_3" >> ~/.bashrc
-    grep -qxF "$LINE_4" ~/.bashrc || echo "$LINE_4" >> ~/.bashrc
+    #grep -qxF "$LINE_4" ~/.bashrc || echo "$LINE_4" >> ~/.bashrc
 
     ## Install nnn plugins
     echo "[info]: Install nnn plugins"
@@ -220,8 +220,13 @@ setup_user_environment() {
     install_font https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip
 
     ## Configure Starship
-    starship preset pastel-powerline -o ~/.config/starship.toml
+    mv $HOME/.starship.toml $HOME/.config/.
+    
     grep -qxF 'starship init bash' "$HOME/.bashrc" || echo 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
+    
+    
+    ## Set default editor
+    export MY_EDITOR=$(update-alternatives --list editor | grep nvim); sudo update-alternatives --set editor ${MY_EDITOR}
 }
 
 my_whoami() {
