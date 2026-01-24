@@ -73,23 +73,33 @@ ubuntu_setup() {
         atool \
         bat \
         bash-completion \
+        coreutils \
         curl \
         eza \
         fzf \
         git \
+        imagemagick \
         keychain \
+        lowdown \
+        mediainfo \
         mise \
+        mpv \
         ncdu \
         nnn \
         neovim \
         pip \
+        poppler-utils \
         python3 \
+        ranger \
         rsync \
         software-properties-common \
         sudo \
         tmux \
         tree \
+        ueberzug \
+        unzip \
         vim \
+        w3m \
         zsh \
         -y
 
@@ -158,6 +168,28 @@ create_user() {
     echo "test ALL=(ALL) NOPASSWD: ALL" | (EDITOR="tee -a" visudo)
 }
 
+install_font() {
+    # Check if the URL is provided
+    if [ -z "$1" ]; then
+      echo "Please provide a URL to a font zip file."
+      exit 1
+    fi
+    # Create a temporary directory
+    TEMP_DIR=$(mktemp -d)
+    # Download the font zip file
+    wget -O "$TEMP_DIR/font.zip" "$1"
+    # Unzip the font file
+    unzip "$TEMP_DIR/font.zip" -d "$TEMP_DIR"
+    # Move the font files to the system fonts directory
+    sudo mv "$TEMP_DIR"/*.{ttf,otf} /usr/local/share/fonts/
+    # Update the font cache
+    fc-cache -f -v
+    # Clean up
+    rm -rf "$TEMP_DIR"
+
+    echo "Fonts installed successfully!"
+}
+
 setup_user_environment() {
     title "setup_user_environment"
     # Create ssh directory
@@ -182,6 +214,14 @@ setup_user_environment() {
     ## Install nnn plugins
     echo "[info]: Install nnn plugins"
     curl -sS https://raw.githubusercontent.com/jarun/nnn/master/plugins/getplugs | sh
+
+    ## Install fonts
+    install_font https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip
+    install_font https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip
+
+    ## Configure Starship
+    starship preset pastel-powerline -o ~/.config/starship.toml
+    grep -qxF 'starship init bash' "$HOME/.bashrc" || echo 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
 }
 
 my_whoami() {

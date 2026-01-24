@@ -19,6 +19,7 @@ export NNN_BATTHEME="ansi"
 export TERMINAL="tmux"
 export NNN_TERMINAL="tmux"
 export NNN_DE_FILE_MANAGER=preview-tui
+export NNN_ICONLOOKUP=1
 export NNN_FIFO="/tmp/nnn.fifo"
 export NNN_PLUG='f:finder;o:fzopen;p:preview-tui;d:diffs;t:nmount;v:imgview;g:-!git diff;s:! readlink -f $nnn'
 
