@@ -29,7 +29,7 @@ $docker_context\
 $time\
 [ ](fg:#33658A)\
 $hostname\
-[ ](fg:#33658A)\
+[🌱 ](fg:#008000)\
 """
 
 # Disable the blank line at the start of the prompt
