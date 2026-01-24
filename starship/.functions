@@ -220,7 +220,7 @@ setup_user_environment() {
     install_font https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip
 
     ## Configure Starship
-    mv $HOME/.starship.toml $HOME/.config/.
+    mv $HOME/starship.toml $HOME/.config/.
     
     grep -qxF 'starship init bash' "$HOME/.bashrc" || echo 'eval "$(starship init bash)"' >> "$HOME/.bashrc"
     
